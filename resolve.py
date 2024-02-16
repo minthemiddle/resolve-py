@@ -29,10 +29,14 @@ def fetch_url_info(url):
 
 # Click command to process the file
 @click.command()
-@click.argument('file', type=click.File('r'))
-def process_urls(file):
-    urls = [line.strip() for line in file if line.strip()]
-    output_file = "result.csv"
+@click.option('--input-file', '-i', 'input_file', type=click.Path(exists=True), required=True, help='Input CSV file path.')
+@click.option('--output-file', '-o', 'output_file', type=click.Path(), default=None, help='Output CSV file path (optional).')
+def process_urls(input_file, output_file):
+    with open(input_file, 'r') as file:
+        urls = [line.strip() for line in file if line.strip()]
+    
+    if output_file is None:
+        output_file = input_file
     
     # Write CSV header
     with open(output_file, 'w', newline='') as csvfile:
