@@ -2,8 +2,20 @@ import click
 import csv
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import subprocess
+from urllib.parse import urlparse
 
-# Function to execute curl and return status code and effective URL
+# Function to extract the base part of the URL
+def extract_base(url):
+    netloc = urlparse(url).netloc
+    netloc = netloc.split(':')[0]
+    netloc = netloc.replace('www.', '')
+    parts = netloc.split('.')
+    if len(parts) > 2:
+        return '.'.join(parts[1:-1])
+    else:
+        return parts[0]
+
+# Function to execute curl and return status code, effective URL, and base change
 def fetch_url_info(url):
     try:
         # Check the status without following redirects
