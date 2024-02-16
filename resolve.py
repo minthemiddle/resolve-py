@@ -6,13 +6,20 @@ import subprocess
 # Function to execute curl and return status code and effective URL
 def fetch_url_info(url):
     try:
+        # Check the status without following redirects
         http_status = subprocess.check_output(
-            ["curl", url, "-s", "-L", "-I", "-o", "/dev/null", "-w", "%{http_code}"],
+            ["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", url],
             universal_newlines=True)
-        url_effective = subprocess.check_output(
-            ["curl", url, "-s", "-L", "-I", "-o", "/dev/null", "-w", "%{url_effective}"],
-            universal_newlines=True)
-        return http_status.strip(), url_effective.strip(), url.strip()
+        
+        # If the status is not an error, follow redirects to get the final URL
+        if http_status.strip() not in ["000", "Error"]:
+            url_effective = subprocess.check_output(
+                ["curl", "-s", "-L", "-o", "/dev/null", "-w", "%{url_effective}", url],
+                universal_newlines=True).strip()
+        else:
+            url_effective = "Error"
+
+        return http_status.strip(), url_effective, url.strip()
     except subprocess.CalledProcessError as e:
         return "Error", url.strip(), url.strip()
 
