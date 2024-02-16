@@ -28,7 +28,7 @@ def fetch_url_info(url):
 @click.argument('file', type=click.File('r'))
 def process_urls(file):
     urls = [line.strip() for line in file if line.strip()]
-    output_file = "result.txt"
+    output_file = "result.csv"
     
     # Write CSV header
     with open(output_file, 'w', newline='') as csvfile:
