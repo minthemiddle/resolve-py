@@ -18,15 +18,13 @@ def extract_base(url):
 # Function to execute curl and return status code, effective URL, and base change
 def fetch_url_info(url):
     try:
-        # Check the status without following redirects
         http_status = subprocess.check_output(
-            ["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}", url],
-            universal_newlines=True)
+            ["curl", "-s", "-o", "/dev/null", "-w", "%{http_code}",  "--connect-timeout", "5", "--max-time", "7", url],
+            universal_newlines=True).strip()
         
-        # If the status is not an error, follow redirects to get the final URL
-        if http_status.strip() not in ["000", "Error"]:
+        if http_status not in ["000", "Error"]:
             url_effective = subprocess.check_output(
-                ["curl", "-s", "-L", "-o", "/dev/null", "-w", "%{url_effective}", url],
+                ["curl", "-s", "-L", "-o", "/dev/null", "-w", "%{url_effective}", "--connect-timeout", "5", "--max-time", "7", url],
                 universal_newlines=True).strip()
         else:
             url_effective = "Error"
